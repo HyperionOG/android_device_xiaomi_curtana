@@ -33,12 +33,13 @@ cc_library_static {
 }
 
 cc_library_static {
-    name: "libinit_curtana",
+    name: "libinit_xiaomi_sm6250",
     recovery_available: true,
     srcs: [
         "init.cpp"
     ],
     whole_static_libs: [
-        "libinit_xiaomi_sm6250_common"
+        "libinit_curtana"
     ]
 }
+
