@@ -45,6 +45,9 @@ TARGET_USE_QTI_BT_STACK := true
 # Bootloader
 TARGET_NO_BOOTLOADER := true
 
+# Bootloader
+TARGET_BOOTLOADER_BOARD_NAME := curtana
+
 # Build broken
 BUILD_BROKEN_USES_BUILD_COPY_HEADERS := true
 
