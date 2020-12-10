@@ -7,7 +7,12 @@
 
 set -e
 
-INITIAL_COPYRIGHT_YEAR=2020
+# Required!
+export DEVICE=curtana
+export VENDOR=xiaomi
+
+export DEVICE_BRINGUP_YEAR=2020
+export INITIAL_COPYRIGHT_YEAR=2020
 
 # Load extract_utils and do some sanity checks
 MY_DIR="${BASH_SOURCE%/*}"
@@ -23,7 +28,7 @@ fi
 source "${HELPER}"
 
 # Initialize the helper for common
-setup_vendor "${DEVICE_COMMON}" "${VENDOR}" "${LINEAGE_ROOT}" true
+setup_vendor "${DEVICE}" "${VENDOR}" "${LINEAGE_ROOT}" true
 
 # Copyright headers and guards
 write_headers "curtana"
