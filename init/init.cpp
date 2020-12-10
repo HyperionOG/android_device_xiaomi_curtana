@@ -14,9 +14,79 @@
  * limitations under the License.
  */
 
+#include <cstdlib>
+#include <cstring>
+#include <sys/sysinfo.h>
+#include <vector>
+
+#include <android-base/properties.h>
+#define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
+#include <sys/_system_properties.h>
+
 #include "init_common.h"
 #include "vendor_init.h"
 
+using android::base::GetProperty;
+
+std::vector<std::string> ro_props_default_source_order = {
+    "",
+    "odm.",
+    "product.",
+    "system.",
+    "vendor.",
+    "system_ext.",
+};
+
+void set_ro_build_prop(const std::string &source, const std::string &prop,
+        const std::string &value, bool product = false) {
+    std::string prop_name;
+
+    if (product) {
+        prop_name = "ro.product." + source + prop;
+    } else {
+        prop_name = "ro." + source + "build." + prop;
+    }
+
+    property_override(prop_name.c_str(), value.c_str(), false);
+}
+
+void set_device_props(const std::string fingerprint, const std::string description,
+        const std::string brand, const std::string device, const std::string model) {
+    for (const auto &source : ro_props_default_source_order) {
+        set_ro_build_prop(source, "fingerprint", fingerprint);
+        set_ro_build_prop(source, "brand", brand, true);
+        set_ro_build_prop(source, "device", device, true);
+        set_ro_build_prop(source, "model", model, true);
+    }
+
+    property_override("ro.build.fingerprint", fingerprint.c_str());
+    property_override("ro.build.description", description.c_str());
+}
+
+void load_device_properties() {
+    std::string hwname = GetProperty("ro.boot.hwname", "");
+    std::string region = GetProperty("ro.boot.hwc", "");
+
+    if (hwname == "curtana") {
+        if (region == "Global_TWO") {
+            set_device_props(
+                    "Redmi/curtana_global/curtana:10/QKQ1.191215.002/V12.0.1.0.QJWMIXM:user/release-keys",
+                    "curtana_global-user 10 QKQ1.191215.002 V12.0.1.0.QJWMIXM release-keys",
+                    "Redmi", "curtana", "Redmi Note 9S");
+            property_override("ro.build.version.security_patch", "2020-10-01");
+            property_override("ro.vendor.build.security_patch", "2020-10-01");
+        } else if (region == "India") {
+            set_device_props(
+                    "Redmi/curtana/curtana:10/QKQ1.191215.002/V12.0.1.0.QJWINXM:user/release-keys",
+                    "curtana_in-user 10 QKQ1.191215.002 V12.0.1.0.QJWINXM release-keys",
+                    "Redmi", "curtana", "Redmi Note 9 Pro");
+            property_override("ro.build.version.security_patch", "2020-09-01");
+            property_override("ro.vendor.build.security_patch", "2020-09-01");
+        }
+    }
+}
+
 void vendor_load_properties() {
     load_common_properties();
+    load_device_properties();
 }
